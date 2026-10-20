@@ -49,7 +49,6 @@ pub fn latest_snapshot(backup: &Path) -> Result<Option<(PathBuf, Manifest)>, Box
     for path in paths.into_iter().rev() {
         let manifest_path = path.join("manifest.json");
 
-        // Ignore incomplete snapshots without a manifest.
         if !manifest_path.is_file() {
             continue;
         }
@@ -61,4 +60,33 @@ pub fn latest_snapshot(backup: &Path) -> Result<Option<(PathBuf, Manifest)>, Box
     }
 
     Ok(None)
+}
+
+pub fn list_snapshots(backup: &Path) -> Result<Vec<(PathBuf, Manifest)>, Box<dyn Error>> {
+    let directory = snapshots_dir(backup);
+    let mut snapshots = Vec::new();
+
+    for entry in fs::read_dir(directory)? {
+        let entry = entry?;
+
+        if !entry.file_type()?.is_dir() {
+            continue;
+        }
+
+        let path = entry.path();
+        let manifest_path = path.join("manifest.json");
+
+        if !manifest_path.is_file() {
+            continue;
+        }
+
+        let json = fs::read_to_string(&manifest_path)?;
+        let manifest: Manifest = serde_json::from_str(&json)?;
+
+        snapshots.push((path, manifest));
+    }
+
+    snapshots.sort_by(|a, b| b.1.created_at.cmp(&a.1.created_at));
+
+    Ok(snapshots)
 }

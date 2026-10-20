@@ -30,6 +30,22 @@ fn run() -> Result<(), Box<dyn Error>> {
         Commands::Backup { backup } => {
             engine::backup(&backup)?;
         }
+
+        Commands::History { backup } => {
+            engine::history(&backup)?;
+        }
+
+        Commands::Restore {
+            backup,
+            snapshot,
+            overwrite,
+        } => {
+            engine::restore(&backup, &snapshot, overwrite)?;
+        }
+
+        Commands::Verify { backup, snapshot } => {
+            engine::verify(&backup, &snapshot)?;
+        }
     }
 
     Ok(())

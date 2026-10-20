@@ -31,4 +31,28 @@ pub enum Commands {
         #[arg(long)]
         backup: PathBuf,
     },
+
+    History {
+        #[arg(long)]
+        backup: PathBuf,
+    },
+
+    Restore {
+        #[arg(long)]
+        backup: PathBuf,
+
+        #[arg(long)]
+        snapshot: String,
+
+        #[arg(long, default_value_t = false)]
+        overwrite: bool,
+    },
+
+    Verify {
+        #[arg(long)]
+        backup: PathBuf,
+
+        #[arg(long)]
+        snapshot: String,
+    },
 }
